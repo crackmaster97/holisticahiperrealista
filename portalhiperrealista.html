@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sanctum — Portal de Reservas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════
+           RESET & BASE — Hiperrealista Esquelomórfico
+           ═══════════════════════════════════════════════════════════ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --parchment: #f5f0e2;
+            --parchment-deep: #e8e0cc;
+            --ink: #121212;
+            --ink-light: #3a3a3a;
+            --gold-1: #8b6914;
+            --gold-2: #c9a84c;
+            --gold-3: #fdf5e6;
+            --gold-4: #d4af37;
+            --gold-5: #6b4f10;
+            --wax-red: #8b1a1a;
+            --wax-red-light: #c1272d;
+            --wax-red-dark: #4a0000;
+            --leather-dark: #1f1410;
+            --leather-mid: #2a1f15;
+            --leather-light: #3d2b1f;
+            --wood: #1a1008;
+            --wood-light: #2b1d12;
+            --shadow-ambient: rgba(0, 0, 0, 0.55);
+            --shadow-contact: rgba(0, 0, 0, 0.75);
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --radius-wax: 47% 53% 50% 51% / 51% 48% 52% 49%;
+            --radius-wax-alt: 48% 52% 51% 49% / 49% 51% 48% 52%;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            background:
+                radial-gradient(ellipse at 20% 80%, #2b1d12 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 15%, #1f1410 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, #231810 0%, #100a05 100%),
+                #1a1008;
+            background-attachment: fixed;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2.5rem 1.5rem 4rem;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Ruido sutil de veta de madera en el fondo */
+        html::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.06;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wood'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.003 0.08' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wood)'/%3E%3C/svg%3E");
+            background-size: 400px;
+        }
+
+        body {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            color: var(--ink);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+            max-width: 1120px;
+            width: 100%;
+            margin: 0 auto;
+            overflow-x: visible;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SVG FILTERS — Texturas
+           ═══════════════════════════════════════════════════════════ */
+        .svg-defs {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PERGAMINO WRAPPER — Elevación y rotación
+           ═══════════════════════════════════════════════════════════ */
+        .pergamino-wrapper {
+            position: relative;
+            z-index: 2;
+            transform: rotate(-0.45deg);
+            transition: transform 0.6s var(--ease);
+            filter:
+                drop-shadow(0 2px 4px var(--shadow-contact)) drop-shadow(0 12px 32px var(--shadow-ambient)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.35));
+        }
+
+        .pergamino-wrapper:hover {
+            transform: rotate(-0.3deg);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PERGAMINO — Superficie de papel con bordes irregulares
+           ═══════════════════════════════════════════════════════════ */
+        .pergamino {
+            position: relative;
+            background: var(--parchment);
+            clip-path: polygon(0% 1.8%,
+                    1.6% 0.3%,
+                    3.2% 0.7%,
+                    5.5% 0.1%,
+                    7.8% 0.9%,
+                    10% 0.2%,
+                    12.3% 0.6%,
+                    15.6% 0%,
+                    18% 0.8%,
+                    21.5% 0.3%,
+                    24% 0.9%,
+                    27.3% 0.1%,
+                    30% 0.5%,
+                    33.6% 0.2%,
+                    36% 0.7%,
+                    39.4% 0%,
+                    42% 0.6%,
+                    45.8% 0.3%,
+                    49% 0.8%,
+                    52.5% 0.1%,
+                    55% 0.5%,
+                    58.3% 0.7%,
+                    61% 0.2%,
+                    64.6% 0.9%,
+                    67% 0.4%,
+                    70.2% 0%,
+                    73.8% 0.6%,
+                    76% 0.3%,
+                    79.5% 0.8%,
+                    82% 0.1%,
+                    85.6% 0.5%,
+                    88% 0.7%,
+                    91.3% 0.2%,
+                    94% 0.6%,
+                    96.5% 0.4%,
+                    98.8% 0.9%,
+                    100% 1.5%,
+                    99.6% 4.2%,
+                    100% 7.8%,
+                    99.3% 10.5%,
+                    100% 14%,
+                    99.5% 17.6%,
+                    100% 21%,
+                    99.2% 24.8%,
+                    100% 28%,
+                    99.4% 31.5%,
+                    100% 35%,
+                    99.7% 38.6%,
+                    100% 42%,
+                    99.3% 45.8%,
+                    100% 49%,
+                    99.5% 52.5%,
+                    100% 56%,
+                    99.2% 59.6%,
+                    100% 63%,
+                    99.6% 66.8%,
+                    100% 70%,
+                    99.4% 73.5%,
+                    100% 77%,
+                    99.3% 80.6%,
+                    100% 84%,
+                    99.5% 87.8%,
+                    100% 91%,
+                    99.2% 94.5%,
+                    99.8% 97%,
+                    100% 98.6%,
+                    98.2% 99.8%,
+                    96% 99.4%,
+                    93.5% 100%,
+                    91% 99.3%,
+                    88.2% 99.7%,
+                    85.6% 100%,
+                    83% 99.5%,
+                    80.5% 99.8%,
+                    78% 99.2%,
+                    75.3% 100%,
+                    72.6% 99.4%,
+                    70% 99.7%,
+                    67.4% 100%,
+                    64.8% 99.3%,
+                    62% 99.6%,
+                    59.5% 99.9%,
+                    57% 99.2%,
+                    54.3% 100%,
+                    51.6% 99.5%,
+                    49% 99.8%,
+                    46.4% 99.3%,
+                    43.8% 100%,
+                    41% 99.4%,
+                    38.5% 99.7%,
+                    36% 99.2%,
+                    33.3% 99.9%,
+                    30.6% 99.5%,
+                    28% 99.8%,
+                    25.4% 99.3%,
+                    23% 99.6%,
+                    20.5% 100%,
+                    18% 99.4%,
+                    15.6% 99.7%,
+                    13% 99.2%,
+                    10.5% 99.8%,
+                    8% 99.5%,
+                    5.8% 100%,
+                    3.5% 99.3%,
+                    1.8% 99.6%,
+                    0% 98.2%,
+                    0.4% 95.5%,
+                    0% 92.8%,
+                    0.7% 90%,
+                    0% 87.3%,
+                    0.5% 84.6%,
+                    0% 82%,
+                    0.8% 79.2%,
+                    0% 76.5%,
+                    0.3% 73.8%,
+                    0% 71%,
+                    0.6% 68.3%,
+                    0% 65.5%,
+                    0.4% 62.8%,
+                    0% 60%,
+                    0.7% 57.2%,
+                    0% 54.5%,
+                    0.2% 51.8%,
+                    0% 49%,
+                    0.5% 46.3%,
+                    0% 43.5%,
+                    0.3% 40.8%,
+                    0% 38%,
+                    0.6% 35.3%,
+                    0% 32.5%,
+                    0.4% 29.8%,
+                    0% 27%,
+                    0.7% 24.2%,
+                    0% 21.5%,
+                    0.2% 18.8%,
+                    0% 16%,
+                    0.5% 13.3%,
+                    0% 10.5%,
+                    0.3% 7.8%,
+                    0% 5%,
+                    0.6% 3.2%);
+            box-shadow:
+                inset 0 3px 6px rgba(255, 255, 255, 0.35),
+                inset 0 -6px 14px rgba(0, 0, 0, 0.08),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* Capa de textura de micro-fibras (ruido del papel) */
+        .pergamino::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: var(--parchment);
+            filter: url(#paperGrain);
+            opacity: 0.65;
+            clip-path: inherit;
+            mix-blend-mode: multiply;
+        }
+
+        /* Capa de borde quemado sutil */
+        .pergamino::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            z-index: -1;
+            pointer-events: none;
+            background: transparent;
+            border: 3px solid transparent;
+            border-image: linear-gradient(135deg,
+                    #3a1f0a 0%,
+                    #5c3317 15%,
+                    #2d1a0e 30%,
+                    #1a0f06 50%,
+                    #3a1f0a 70%,
+                    #5c3317 85%,
+                    #2d1a0e 100%) 1;
+            clip-path: inherit;
+            opacity: 0.7;
+            filter: blur(0.6px);
+        }
+
+        /* Contenido interno por encima de la textura */
+        .pergamino>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           TIPOGRAFÍA — Tinta china con sangrado
+           ═══════════════════════════════════════════════════════════ */
+        h1,
+        h2,
+        h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            line-height: 1.15;
+            color: #141414;
+            text-shadow: 0.4px 0.4px 0.8px rgba(0, 0, 0, 0.28),
+                0.2px 0.2px 0.3px rgba(0, 0, 0, 0.18);
+            /* Presión de pluma: opacidad variable */
+            opacity: 0.95;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 6.5rem);
+            font-style: italic;
+            opacity: 0.94;
+        }
+        h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            opacity: 0.96;
+        }
+        h3 {
+            font-size: 1.35rem;
+            opacity: 0.97;
+        }
+
+        p,
+        span,
+        a,
+        label,
+        button,
+        .cal-day,
+        .time-slot,
+        .field-input,
+        .field-select,
+        .field-textarea {
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.2);
+        }
+
+        p {
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            color: #2e2e2e;
+            line-height: 1.9;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           LAYOUT
+           ═══════════════════════════════════════════════════════════ */
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+        }
+
+        section {
+            padding: clamp(3rem, 8vw, 6rem) 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           HEADER — Integrado en el pergamino
+           ═══════════════════════════════════════════════════════════ */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1.4rem clamp(1.5rem, 5vw, 4rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(245, 240, 226, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            transition: border-color 0.5s var(--ease), background 0.5s var(--ease);
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: #1a1a1a;
+            text-decoration: none;
+            text-shadow: 0.3px 0.3px 0.6px rgba(0, 0, 0, 0.25);
+            white-space: nowrap;
+        }
+
+        .logo span {
+            display: inline-block;
+            width: 1px;
+            height: 1em;
+            background: linear-gradient(180deg, var(--gold-1), var(--gold-3), var(--gold-1));
+            margin: 0 0.7em;
+            vertical-align: middle;
+            opacity: 0.75;
+            box-shadow: 0 0 4px rgba(201, 169, 110, 0.4);
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            font-size: 0.66rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #3a3a3a;
+            text-decoration: none;
+            transition: color 0.35s var(--ease), text-shadow 0.35s var(--ease);
+            position: relative;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 100%;
+            height: 1px;
+            background: var(--gold-4);
+            transition: right 0.45s var(--ease);
+            opacity: 0.6;
+        }
+        nav a:hover {
+            color: #0a0a0a;
+            text-shadow: 0.4px 0.4px 0.7px rgba(0, 0, 0, 0.35);
+        }
+        nav a:hover::after {
+            right: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           HERO
+           ═══════════════════════════════════════════════════════════ */
+        #hero {
+            min-height: 85svh;
+            display: flex;
+            align-items: center;
+            padding-top: 40px;
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-text {
+            opacity: 0;
+            animation: fadeUp 1.2s var(--ease) 0.3s forwards;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.62rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold-2);
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.3);
+        }
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 2.2rem;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-4), var(--gold-2));
+            box-shadow: 0 0 3px rgba(201, 169, 110, 0.5);
+        }
+
+        .hero-title {
+            margin-bottom: 1.8rem;
+            font-style: italic;
+        }
+
+        .hero-subtitle {
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            color: #2e2e2e;
+            line-height: 2;
+            max-width: 36ch;
+            margin-bottom: 3rem;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.18);
+        }
+
+        .hero-visual {
+            opacity: 0;
+            animation: fadeIn 1.6s var(--ease) 0.6s forwards;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-emblem {
+            width: min(380px, 85%);
+            aspect-ratio: 1;
+            border: 1.5px solid rgba(0, 0, 0, 0.12);
+            border-radius: 49% 51% 50% 51% / 51% 50% 51% 49%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                inset 0 0 30px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(0, 0, 0, 0.06);
+        }
+        .hero-emblem::before {
+            content: '';
+            position: absolute;
+            inset: 18px;
+            border: 1px solid rgba(0, 0, 0, 0.09);
+            border-radius: 49% 51% 50% 51% / 51% 50% 51% 49%;
+        }
+        .hero-emblem::after {
+            content: '';
+            position: absolute;
+            inset: 36px;
+            border: 1px dashed rgba(139, 105, 20, 0.2);
+            border-radius: 49% 51% 50% 51% / 51% 50% 51% 49%;
+        }
+
+        .emblem-svg {
+            width: 50%;
+            opacity: 0.45;
+            filter: drop-shadow(0 0 6px rgba(139, 105, 20, 0.3));
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           BOTONES — Sello de Lacre y Metal Dorado
+           ═══════════════════════════════════════════════════════════ */
+        .btn {
+            display: inline-block;
+            padding: 0.95rem 2.4rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.66rem;
+            font-weight: 400;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.5s var(--ease);
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0.4px 0.4px 0.6px rgba(0, 0, 0, 0.3);
+            border: none;
+            outline: none;
+        }
+
+        /* Botón de lacre rojo */
+        .btn-primary {
+            background: radial-gradient(ellipse at 33% 28%,
+                    var(--wax-red-light) 0%,
+                    #a52020 30%,
+                    var(--wax-red) 60%,
+                    var(--wax-red-dark) 100%);
+            color: #fdf5e6;
+            border-radius: var(--radius-wax);
+            box-shadow:
+                inset 2px 2px 5px rgba(255, 255, 255, 0.22),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.7),
+                inset 0 0 8px rgba(0, 0, 0, 0.3),
+                0 5px 12px rgba(0, 0, 0, 0.5),
+                0 1.5px 3px rgba(0, 0, 0, 0.7);
+            letter-spacing: 0.3em;
+            transform: translateY(0);
+        }
+        .btn-primary:hover {
+            box-shadow:
+                inset 2px 2px 6px rgba(255, 255, 255, 0.28),
+                inset -4px -4px 10px rgba(0, 0, 0, 0.8),
+                inset 0 0 12px rgba(0, 0, 0, 0.4),
+                0 7px 18px rgba(0, 0, 0, 0.55),
+                0 2px 4px rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+            color: #fff;
+        }
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow:
+                inset 3px 3px 8px rgba(0, 0, 0, 0.7),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.1),
+                0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Botón outline — como un sello más claro */
+        .btn-outline {
+            background: transparent;
+            color: #1a1a1a;
+            border: 1.5px solid rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-wax-alt);
+            box-shadow:
+                inset 1px 1px 3px rgba(255, 255, 255, 0.4),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.1),
+                0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .btn-outline:hover {
+            background: radial-gradient(ellipse at 35% 30%,
+                    rgba(139, 105, 20, 0.15) 0%,
+                    rgba(0, 0, 0, 0.05) 80%);
+            color: #0a0a0a;
+            border-color: rgba(0, 0, 0, 0.5);
+            box-shadow:
+                inset 1px 1px 4px rgba(255, 255, 255, 0.5),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+                0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Botón dorado — metal bruñido */
+        .btn-gold {
+            background: linear-gradient(135deg,
+                    var(--gold-1) 0%,
+                    var(--gold-2) 18%,
+                    var(--gold-3) 38%,
+                    var(--gold-4) 55%,
+                    var(--gold-2) 72%,
+                    var(--gold-1) 88%,
+                    var(--gold-5) 100%);
+            color: #1a0f06;
+            border-radius: var(--radius-wax);
+            box-shadow:
+                inset 1px 1px 3px rgba(255, 255, 255, 0.5),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.6),
+                inset 0 0 6px rgba(0, 0, 0, 0.2),
+                0 5px 14px rgba(0, 0, 0, 0.5),
+                0 1.5px 3px rgba(0, 0, 0, 0.7);
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.28em;
+            font-weight: 500;
+        }
+        .btn-gold:hover {
+            box-shadow:
+                inset 1px 1px 4px rgba(255, 255, 255, 0.6),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.7),
+                inset 0 0 10px rgba(0, 0, 0, 0.3),
+                0 7px 20px rgba(0, 0, 0, 0.55),
+                0 2px 5px rgba(0, 0, 0, 0.8);
+            color: #0a0600;
+            transform: translateY(-1px);
+        }
+        .btn-gold:active {
+            transform: translateY(2px);
+            box-shadow:
+                inset 3px 3px 8px rgba(0, 0, 0, 0.7),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.2),
+                0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           DIVIDER
+           ═══════════════════════════════════════════════════════════ */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.25), transparent);
+        }
+        .divider-icon {
+            color: var(--gold-4);
+            opacity: 0.7;
+            filter: drop-shadow(0 0 3px rgba(201, 169, 110, 0.5));
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SECTION HEADER
+           ═══════════════════════════════════════════════════════════ */
+        .section-header {
+            text-align: center;
+            margin-bottom: clamp(2.5rem, 6vw, 5rem);
+        }
+        .section-eyebrow {
+            font-size: 0.6rem;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            color: var(--gold-2);
+            margin-bottom: 1rem;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.25);
+        }
+        .section-title {
+            margin-bottom: 0.8rem;
+        }
+        .section-sub {
+            max-width: 42ch;
+            margin: 0 auto;
+            color: #3a3a3a;
+            text-shadow: 0.2px 0.2px 0.4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SERVICES — Cuero grabado en fuego
+           ═══════════════════════════════════════════════════════════ */
+        #servicios {
+            background: #e6dcc8;
+            position: relative;
+        }
+        #servicios::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(0, 0, 0, 0.015) 8px,
+                    rgba(0, 0, 0, 0.015) 9px);
+            opacity: 0.4;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+            position: relative;
+            z-index: 2;
+            padding: 0.5rem;
+        }
+
+        .service-card {
+            background: linear-gradient(175deg,
+                    var(--leather-light) 0%,
+                    var(--leather-mid) 40%,
+                    var(--leather-dark) 100%);
+            padding: 2.8rem 2.2rem;
+            cursor: pointer;
+            transition: all 0.5s var(--ease);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border-radius: 2px 3px 2px 2px;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            box-shadow:
+                inset 2px 2px 6px rgba(0, 0, 0, 0.85),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.04),
+                0 6px 16px rgba(0, 0, 0, 0.5),
+                0 1px 3px rgba(0, 0, 0, 0.7);
+            /* Textura de cuero */
+            filter: url(#leatherGrain);
+        }
+        .service-card:hover {
+            box-shadow:
+                inset 4px 4px 10px rgba(0, 0, 0, 0.9),
+                inset -1px -1px 3px rgba(255, 255, 255, 0.02),
+                0 4px 10px rgba(0, 0, 0, 0.6),
+                0 1px 2px rgba(0, 0, 0, 0.8);
+            transform: translateY(2px);
+            border-color: rgba(0, 0, 0, 0.7);
+        }
+        .service-card.selected {
+            box-shadow:
+                inset 5px 5px 12px rgba(0, 0, 0, 0.95),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.01),
+                0 3px 8px rgba(0, 0, 0, 0.65);
+            transform: translateY(3px);
+            border-color: rgba(0, 0, 0, 0.8);
+            background: linear-gradient(175deg,
+                    #2a1a10 0%,
+                    #1f1410 40%,
+                    #150d08 100%);
+        }
+
+        .service-card-icon {
+            width: 38px;
+            height: 38px;
+            margin-bottom: 1.8rem;
+            color: #c9a84c;
+            transition: all 0.5s var(--ease);
+            filter: drop-shadow(0 0 5px rgba(201, 168, 76, 0.5)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+        }
+        .service-card:hover .service-card-icon,
+        .service-card.selected .service-card-icon {
+            color: #fdf5e6;
+            transform: scale(1.06);
+            filter: drop-shadow(0 0 8px rgba(253, 245, 230, 0.6)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+        }
+
+        .service-card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #e8d5b0;
+            margin-bottom: 0.8rem;
+            transition: color 0.5s var(--ease);
+            letter-spacing: 0.03em;
+            text-shadow: 0.4px 0.4px 0.7px rgba(0, 0, 0, 0.5);
+            opacity: 0.96;
+        }
+        .service-card:hover .service-card-title,
+        .service-card.selected .service-card-title {
+            color: #fdf5e6;
+            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.6);
+        }
+
+        .service-card-desc {
+            font-size: 0.73rem;
+            letter-spacing: 0.06em;
+            line-height: 1.9;
+            color: #b8a088;
+            flex: 1;
+            margin-bottom: 2rem;
+            transition: color 0.5s var(--ease);
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.4);
+        }
+        .service-card:hover .service-card-desc,
+        .service-card.selected .service-card-desc {
+            color: #d4c0a8;
+        }
+
+        .service-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px solid rgba(232, 213, 176, 0.18);
+            padding-top: 1.5rem;
+            transition: border-color 0.5s var(--ease);
+        }
+        .service-card:hover .service-card-meta,
+        .service-card.selected .service-card-meta {
+            border-color: rgba(253, 245, 230, 0.3);
+        }
+
+        .service-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: #d4af37;
+            transition: color 0.5s var(--ease);
+            text-shadow: 0.3px 0.3px 0.6px rgba(0, 0, 0, 0.5);
+        }
+        .service-price sup {
+            font-size: 0.65rem;
+            vertical-align: super;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            color: #c9a84c;
+        }
+        .service-card:hover .service-price,
+        .service-card.selected .service-price {
+            color: #fdf5e6;
+        }
+
+        .service-duration {
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #8a7a68;
+            transition: color 0.5s var(--ease);
+            text-shadow: 0.2px 0.2px 0.4px rgba(0, 0, 0, 0.4);
+        }
+        .service-card:hover .service-duration,
+        .service-card.selected .service-duration {
+            color: #c9b898;
+        }
+
+        .service-check {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 22px;
+            height: 22px;
+            border: 1.5px solid rgba(232, 213, 176, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.45s var(--ease);
+            background: transparent;
+        }
+        .service-card.selected .service-check {
+            opacity: 1;
+            background: radial-gradient(circle at 40% 35%, #c9a84c, #8b6914);
+            border-color: #6b4f10;
+            box-shadow: 0 0 8px rgba(201, 168, 76, 0.6), inset 0 0 3px rgba(0, 0, 0, 0.3);
+        }
+        .service-check svg {
+            width: 10px;
+            color: #1a0f06;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           BOOKING SECTION
+           ═══════════════════════════════════════════════════════════ */
+        #reserva {
+            background: #f0ebdb;
+            position: relative;
+        }
+
+        .booking-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        /* ─── CALENDAR — Marco de metal dorado ─────────────────── */
+        .calendar-wrap {
+            border: 2px solid transparent;
+            border-image: linear-gradient(135deg,
+                    var(--gold-1),
+                    var(--gold-3),
+                    var(--gold-4),
+                    var(--gold-1)) 1;
+            border-radius: 2px;
+            overflow: hidden;
+            background: #faf7f0;
+            box-shadow:
+                0 8px 24px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+        }
+
+        .calendar-header {
+            padding: 1.4rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: #f5efe0;
+        }
+
+        .cal-nav {
+            background: none;
+            border: 1.5px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            color: #3a3a3a;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 48% 52% 51% 49% / 49% 51% 48% 52%;
+            transition: all 0.35s var(--ease);
+            box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        .cal-nav:hover {
+            border-color: rgba(0, 0, 0, 0.5);
+            color: #0a0a0a;
+            box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.6), 0 3px 8px rgba(0, 0, 0, 0.25);
+        }
+        .cal-nav:disabled {
+            opacity: 0.35;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .cal-month {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: #1a1a1a;
+            text-align: center;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.2);
+        }
+        .cal-month small {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.58rem;
+            letter-spacing: 0.28em;
+            color: #5a5a5a;
+            text-transform: uppercase;
+            margin-top: 0.15rem;
+        }
+
+        .calendar-grid {
+            padding: 1.5rem 1.8rem 1.8rem;
+        }
+
+        .cal-days-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 0.6rem;
+        }
+        .cal-day-name {
+            text-align: center;
+            font-size: 0.56rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #6b6b6b;
+            padding: 0.3rem;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+
+        .cal-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            color: #1a1a1a;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: 47% 53% 50% 51% / 51% 48% 52% 49%;
+            transition: all 0.3s var(--ease);
+            position: relative;
+            background: transparent;
+        }
+        .cal-day:hover:not(.past):not(.empty) {
+            border-color: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.03);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03);
+        }
+        .cal-day.past {
+            color: #b0b0b0;
+            cursor: default;
+            pointer-events: none;
+            text-shadow: none;
+        }
+        .cal-day.empty {
+            cursor: default;
+        }
+        .cal-day.today {
+            color: #8b6914;
+            font-weight: 500;
+            border-color: rgba(139, 105, 20, 0.4);
+            background: rgba(139, 105, 20, 0.06);
+        }
+        .cal-day.selected {
+            background: radial-gradient(ellipse at 40% 35%,
+                    #2a2a2a 0%,
+                    #0a0a0a 100%);
+            color: #f5f0e2;
+            border-color: #0a0a0a;
+            box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.2),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.6),
+                0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .cal-day.has-slots::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--gold-4);
+            border-radius: 50%;
+            box-shadow: 0 0 3px rgba(212, 175, 55, 0.6);
+        }
+        .cal-day.selected::after {
+            background: var(--gold-3);
+            box-shadow: 0 0 4px rgba(253, 245, 230, 0.7);
+        }
+
+        /* ─── TIME SLOTS — Placas de metal ────────────────────── */
+        .time-slots {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .time-slots-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #3a3a3a;
+            margin-bottom: 1rem;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .time-slot {
+            padding: 0.6rem 0.5rem;
+            text-align: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            color: #1a1a1a;
+            border: 1.5px solid rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s var(--ease);
+            background: #fdfaf4;
+            box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.1);
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+        .time-slot:hover {
+            border-color: rgba(0, 0, 0, 0.5);
+            background: #f5efe0;
+            box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.7),
+                0 3px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+        .time-slot.selected {
+            background: radial-gradient(ellipse at 40% 35%,
+                    #2a2a2a 0%,
+                    #0a0a0a 100%);
+            color: #f5f0e2;
+            border-color: #0a0a0a;
+            box-shadow: inset 2px 2px 4px rgba(255, 255, 255, 0.2),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.6),
+                0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+        .time-slot.past {
+            color: #c0c0c0;
+            cursor: default;
+            pointer-events: none;
+            background: #f0ece0;
+            box-shadow: none;
+            border-color: rgba(0, 0, 0, 0.08);
+            text-shadow: none;
+        }
+
+        /* ─── FORM ────────────────────────────────────────────── */
+        .form-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 1.6rem;
+        }
+
+        .form-summary {
+            padding: 1.4rem 1.8rem;
+            border: 1.5px solid rgba(0, 0, 0, 0.15);
+            border-radius: 2px;
+            background: #fdfaf4;
+            margin-bottom: 0.5rem;
+            box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.6),
+                0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-summary-label {
+            font-size: 0.58rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--gold-2);
+            margin-bottom: 0.5rem;
+            text-shadow: 0.2px 0.2px 0.4px rgba(0, 0, 0, 0.2);
+        }
+        .form-summary-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #1a1a1a;
+            line-height: 1.5;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.2);
+        }
+        .form-summary-empty {
+            font-size: 0.75rem;
+            color: #8a8a8a;
+            font-style: italic;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.1);
+        }
+
+        .field-group {
+            position: relative;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.58rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: #3a3a3a;
+            margin-bottom: 0.55rem;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+
+        .field-input,
+        .field-select,
+        .field-textarea {
+            width: 100%;
+            padding: 0.85rem 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            color: #1a1a1a;
+            background: #fdfaf4;
+            border: 1.5px solid rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+            outline: none;
+            transition: all 0.35s var(--ease);
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.06),
+                0 1px 2px rgba(0, 0, 0, 0.04);
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.15);
+        }
+        .field-input:focus,
+        .field-select:focus,
+        .field-textarea:focus {
+            border-color: rgba(0, 0, 0, 0.5);
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.08),
+                0 0 0 4px rgba(0, 0, 0, 0.03),
+                0 3px 10px rgba(0, 0, 0, 0.1);
+            background: #fffef9;
+        }
+        .field-input::placeholder,
+        .field-textarea::placeholder {
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        .field-textarea {
+            resize: none;
+            height: 90px;
+            line-height: 1.8;
+        }
+
+        .field-select-wrap {
+            position: relative;
+        }
+        .field-select-wrap::after {
+            content: '';
+            position: absolute;
+            right: 1.1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #3a3a3a;
+            pointer-events: none;
+        }
+        .field-select {
+            cursor: pointer;
+            padding-right: 2.5rem;
+        }
+        .field-select option {
+            background: #fdfaf4;
+            color: #1a1a1a;
+        }
+
+        .form-cta {
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .form-cta-note {
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            color: #6b6b6b;
+            text-align: center;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PHILOSOPHY — Mancha de tinta sobre pergamino
+           ═══════════════════════════════════════════════════════════ */
+        #filosofia {
+            background: #d8cfb8;
+            position: relative;
+            overflow: hidden;
+        }
+        #filosofia::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(ellipse at 30% 60%,
+                    rgba(20, 15, 10, 0.55) 0%,
+                    rgba(30, 22, 14, 0.35) 35%,
+                    rgba(40, 30, 20, 0.12) 65%,
+                    transparent 100%);
+            opacity: 0.85;
+        }
+        #filosofia .container {
+            position: relative;
+            z-index: 2;
+        }
+        #filosofia .section-eyebrow {
+            color: #c9a84c;
+            text-shadow: 0.3px 0.3px 0.6px rgba(0, 0, 0, 0.4);
+        }
+        #filosofia .section-title {
+            color: #f5f0e2;
+            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.5);
+            opacity: 0.95;
+        }
+        #filosofia .section-sub {
+            color: rgba(245, 240, 226, 0.55);
+            text-shadow: 0.3px 0.3px 0.6px rgba(0, 0, 0, 0.35);
+        }
+
+        .pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+            margin-top: 3rem;
+            border: 1px solid rgba(245, 240, 226, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .pillar {
+            padding: 2.5rem 2rem;
+            border-right: 1px solid rgba(245, 240, 226, 0.1);
+            text-align: center;
+            transition: background 0.4s var(--ease);
+        }
+        .pillar:last-child {
+            border-right: none;
+        }
+        .pillar:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .pillar-icon {
+            width: 26px;
+            height: 26px;
+            color: #d4af37;
+            margin: 0 auto 1.2rem;
+            opacity: 0.85;
+            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
+        }
+
+        .pillar-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: #f5f0e2;
+            margin-bottom: 0.6rem;
+            font-style: italic;
+            text-shadow: 0.4px 0.4px 0.7px rgba(0, 0, 0, 0.4);
+            opacity: 0.95;
+        }
+
+        .pillar-text {
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            color: rgba(245, 240, 226, 0.5);
+            line-height: 1.9;
+            text-shadow: 0.2px 0.2px 0.4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════════ */
+        footer {
+            background: #e8e0cc;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 3rem clamp(1.5rem, 5vw, 4rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: #1a1a1a;
+            letter-spacing: 0.05em;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.25);
+            opacity: 0.94;
+        }
+
+        .footer-copy {
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            color: #5a5a5a;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           MODAL — Fuera del pergamino
+           ═══════════════════════════════════════════════════════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 5, 2, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s var(--ease);
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: #f5f0e2;
+            border: 2px solid transparent;
+            border-image: linear-gradient(135deg,
+                    var(--gold-1),
+                    var(--gold-3),
+                    var(--gold-4),
+                    var(--gold-1)) 1;
+            border-radius: 3px;
+            max-width: 500px;
+            width: 100%;
+            padding: 3.2rem;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.5s var(--ease);
+            position: relative;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(0, 0, 0, 0.1);
+            filter: url(#paperGrain);
+        }
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 54px;
+            height: 54px;
+            background: radial-gradient(circle at 40% 35%, #fdf5e6, #d4af37);
+            border: 1.5px solid rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.8rem;
+            color: #1a0f06;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.5), inset 0 0 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.9rem;
+            font-style: italic;
+            color: #1a1a1a;
+            margin-bottom: 0.8rem;
+            text-shadow: 0.4px 0.4px 0.7px rgba(0, 0, 0, 0.25);
+            opacity: 0.94;
+        }
+
+        .modal-text {
+            font-size: 0.76rem;
+            letter-spacing: 0.06em;
+            color: #3a3a3a;
+            line-height: 2;
+            margin-bottom: 2rem;
+            text-shadow: 0.2px 0.2px 0.4px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-summary {
+            background: #fdfaf4;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 2px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .modal-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.35rem 0;
+        }
+        .modal-summary-row+.modal-summary-row {
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            margin-top: 0.35rem;
+        }
+        .modal-summary-key {
+            font-size: 0.58rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #6b6b6b;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.15);
+        }
+        .modal-summary-val {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #5a5a5a;
+            font-size: 1.4rem;
+            transition: color 0.3s var(--ease);
+            line-height: 1;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+        .modal-close:hover {
+            color: #0a0a0a;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           VALIDATION
+           ═══════════════════════════════════════════════════════════ */
+        .field-group.error .field-input,
+        .field-group.error .field-select {
+            border-color: #8b1a1a;
+            box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.08);
+        }
+        .field-error {
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            color: #8b1a1a;
+            margin-top: 0.35rem;
+            display: none;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+        .field-group.error .field-error {
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           TOAST
+           ═══════════════════════════════════════════════════════════ */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: radial-gradient(ellipse at 40% 35%, #2a2a2a, #0a0a0a);
+            color: #f5f0e2;
+            padding: 1rem 1.8rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            z-index: 600;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s var(--ease);
+            pointer-events: none;
+            max-width: 320px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            text-shadow: 0.3px 0.3px 0.5px rgba(0, 0, 0, 0.3);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SCROLL INDICATOR
+           ═══════════════════════════════════════════════════════════ */
+        .scroll-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 4rem;
+            opacity: 0;
+            animation: fadeIn 1s var(--ease) 1.5s forwards;
+        }
+        .scroll-hint span {
+            font-size: 0.53rem;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: #5a5a5a;
+            text-shadow: 0.2px 0.2px 0.3px rgba(0, 0, 0, 0.2);
+        }
+        .scroll-line {
+            width: 1px;
+            height: 44px;
+            background: linear-gradient(to bottom, #2a2a2a, transparent);
+            animation: scrollLine 2s var(--ease) infinite;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ANIMATIONS
+           ═══════════════════════════════════════════════════════════ */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes scrollLine {
+            0% {
+                transform: scaleY(0) translateY(-100%);
+                transform-origin: top;
+                opacity: 1;
+            }
+            50% {
+                transform: scaleY(1) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scaleY(0) translateY(100%);
+                opacity: 0;
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            html {
+                padding: 1rem 0.8rem 2rem;
+            }
+            .pergamino-wrapper {
+                transform: rotate(-0.25deg);
+            }
+            .hero-inner {
+                grid-template-columns: 1fr;
+            }
+            .hero-visual {
+                display: none;
+            }
+            .booking-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            nav {
+                display: none;
+            }
+            .pillar {
+                border-right: none;
+                border-bottom: 1px solid rgba(245, 240, 226, 0.1);
+            }
+            .pillar:last-child {
+                border-bottom: none;
+            }
+            .modal {
+                padding: 2.5rem 1.8rem;
+            }
+            footer {
+                justify-content: center;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .slots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .services-grid {
+                gap: 1rem;
+            }
+            .service-card {
+                border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════
+   SVG FILTERS — Definiciones de textura
+   ═══════════════════════════════════════════════════════════ -->
+    <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+            <!-- Textura de micro-fibras de papel prensado -->
+            <filter id="paperGrain" x="0" y="0" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="6" stitchTiles="stitch" result="noise" />
+                <feColorMatrix type="matrix"
+                values="
+                0.95 0 0 0 0.04
+                0 0.93 0 0 0.03
+                0 0 0.90 0 0.02
+                0 0 0 0.18 0"
+                result="coloredNoise" />
+                <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply" result="blend1" />
+            </filter>
+
+            <!-- Textura de cuero rugoso -->
+            <filter id="leatherGrain" x="0" y="0" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="5" stitchTiles="stitch" result="noise" />
+                <feColorMatrix type="matrix"
+                values="
+                0.15 0 0 0 0.08
+                0 0.11 0 0 0.05
+                0 0 0.09 0 0.03
+                0 0 0 0.35 0"
+                result="coloredNoise" />
+                <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply" result="blend1" />
+            </filter>
+
+            <!-- Gradiente metálico dorado para referencias -->
+            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b6914" />
+                <stop offset="20%" stop-color="#c9a84c" />
+                <stop offset="40%" stop-color="#fdf5e6" />
+                <stop offset="60%" stop-color="#d4af37" />
+                <stop offset="85%" stop-color="#8b6914" />
+                <stop offset="100%" stop-color="#6b4f10" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- ═══════════════════════════════════════════════════════════
+   PERGAMINO — Envoltorio físico del portal
+   ═══════════════════════════════════════════════════════════ -->
+    <div class="pergamino-wrapper">
+        <div class="pergamino">
+
+            <!-- ░░ HEADER ░░ -->
+            <header>
+                <a href="#" class="logo">Sanctum<span></span>Holístico</a>
+                <nav>
+                    <a href="#servicios">Servicios</a>
+                    <a href="#reserva">Reservas</a>
+                    <a href="#filosofia">Filosofía</a>
+                </nav>
+                <a href="#reserva" class="btn btn-outline" style="padding:0.52rem 1.3rem;">Solicitar Cita</a>
+            </header>
+
+            <!-- ░░ HERO ░░ -->
+            <section id="hero">
+                <div class="container">
+                    <div class="hero-inner">
+                        <div class="hero-text">
+                            <p class="hero-eyebrow">Portal de Reservas Exclusivo</p>
+                            <h1>Tu Espacio<br>de Conexión<br>Elevada</h1>
+                            <p class="hero-subtitle">Un entorno de consciencia expandida, diseñado para quienes buscan transformación profunda a través de prácticas ancestrales de alto nivel.</p>
+                            <a href="#reserva" class="btn btn-primary"><span>Solicitar Cita →</span></a>
+                            <div class="scroll-hint">
+                                <div class="scroll-line"></div>
+                                <span>Explorar</span>
+                            </div>
+                        </div>
+                        <div class="hero-visual">
+                            <div class="hero-emblem">
+                                <svg class="emblem-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="100" cy="100" r="80" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="100" cy="60" r="40" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="65.4" cy="80" r="40" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="134.6" cy="80" r="40" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="65.4" cy="120" r="40" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="134.6" cy="120" r="40" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="100" cy="140" r="40" stroke="#8b6914" stroke-width="0.5" />
+                                    <circle cx="100" cy="100" r="40" stroke="#8b6914" stroke-width="0.75" />
+                                    <polygon points="100,30 164,65 164,135 100,170 36,135 36,65" stroke="#8b6914" stroke-width="0.4" fill="none" />
+                                    <line x1="100" y1="30" x2="100" y2="170" stroke="#8b6914" stroke-width="0.3" />
+                                    <line x1="36" y1="65" x2="164" y2="135" stroke="#8b6914" stroke-width="0.3" />
+                                    <line x1="164" y1="65" x2="36" y2="135" stroke="#8b6914" stroke-width="0.3" />
+                                    <circle cx="100" cy="100" r="4" fill="#8b6914" fill-opacity="0.5" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ░░ SERVICES ░░ -->
+            <section id="servicios">
+                <div class="container">
+                    <div class="section-header reveal">
+                        <p class="section-eyebrow">Catálogo de Experiencias</p>
+                        <h2 class="section-title">Servicios Curados</h2>
+                        <p class="section-sub">Cada sesión es diseñada como un rito de paso personal, con intención, precisión y presencia total.</p>
+                    </div>
+
+                    <div class="services-grid reveal">
+
+                        <div class="service-card" data-service="Experiencia de Tarot Integral" data-price="USD 120" data-duration="90 min" onclick="selectService(this)">
+                            <div class="service-check">
+                                <svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 3.5,7 9,1" /></svg>
+                            </div>
+                            <svg class="service-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <rect x="4" y="2" width="10" height="16" rx="1" />
+                                <path d="M9 6l1.5 2L13 5m0 5H7m0 3h4" />
+                                <path d="M14 6h4a1 1 0 011 1v13a1 1 0 01-1 1H9a1 1 0 01-1-1v-2" />
+                            </svg>
+                            <h3 class="service-card-title">Experiencia de Tarot Integral</h3>
+                            <p class="service-card-desc">Una lectura profunda y multidimensional que integra arquetipos junguianos, numerología esotérica y análisis de patrones kármicos para revelar el mapa de tu proceso interior actual.</p>
+                            <div class="service-card-meta">
+                                <span class="service-price"><sup>USD</sup> 120</span>
+                                <span class="service-duration">90 minutos</span>
+                            </div>
+                        </div>
+
+                        <div class="service-card" data-service="Armonización Energética Premium" data-price="USD 180" data-duration="120 min" onclick="selectService(this)">
+                            <div class="service-check">
+                                <svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 3.5,7 9,1" /></svg>
+                            </div>
+                            <svg class="service-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M12 3C12 3 8 7 8 12s4 9 4 9" />
+                                <path d="M3 12h18" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <h3 class="service-card-title">Armonización Energética Premium</h3>
+                            <p class="service-card-desc">Sesión de reequilibrio del campo áurico mediante técnicas de biomagnetismo, reiki avanzado y alineación de chakras con cristales de alta vibración, en un entorno de ceremonia.</p>
+                            <div class="service-card-meta">
+                                <span class="service-price"><sup>USD</sup> 180</span>
+                                <span class="service-duration">120 minutos</span>
+                            </div>
+                        </div>
+
+                        <div class="service-card" data-service="Viaje Akáshico Guiado" data-price="USD 220" data-duration="150 min" onclick="selectService(this)">
+                            <div class="service-check">
+                                <svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 3.5,7 9,1" /></svg>
+                            </div>
+                            <svg class="service-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                <path d="M2 17l10 5 10-5" />
+                                <path d="M2 12l10 5 10-5" />
+                            </svg>
+                            <h3 class="service-card-title">Viaje Akáshico Guiado</h3>
+                            <p class="service-card-desc">Acceso profundo a los Registros Akáshicos del alma para explorar patrones de vidas pasadas, contratos del alma, misión de vida y bloqueos transgeneracionales con guía experta y compasiva.</p>
+                            <div class="service-card-meta">
+                                <span class="service-price"><sup>USD</sup> 220</span>
+                                <span class="service-duration">150 minutos</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ░░ BOOKING ░░ -->
+            <section id="reserva">
+                <div class="container">
+                    <div class="section-header reveal">
+                        <p class="section-eyebrow">Agendamiento</p>
+                        <h2 class="section-title">Solicitud de Reserva</h2>
+                        <p class="section-sub">Selecciona fecha y horario de tu preferencia. Te confirmaremos disponibilidad en menos de 24 horas.</p>
+                    </div>
+
+                    <div class="booking-layout">
+
+                        <!-- Calendar -->
+                        <div class="reveal">
+                            <div class="calendar-wrap">
+                                <div class="calendar-header">
+                                    <button class="cal-nav" id="prevMonth" onclick="changeMonth(-1)" aria-label="Mes anterior">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15,18 9,12 15,6" /></svg>
+                                    </button>
+                                    <div class="cal-month">
+                                        <span id="calMonthName">—</span>
+                                        <small id="calYear">—</small>
+                                    </div>
+                                    <button class="cal-nav" id="nextMonth" onclick="changeMonth(1)" aria-label="Mes siguiente">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9,18 15,12 9,6" /></svg>
+                                    </button>
+                                </div>
+                                <div class="calendar-grid">
+                                    <div class="cal-days-header">
+                                        <div class="cal-day-name">Do</div>
+                                        <div class="cal-day-name">Lu</div>
+                                        <div class="cal-day-name">Ma</div>
+                                        <div class="cal-day-name">Mi</div>
+                                        <div class="cal-day-name">Ju</div>
+                                        <div class="cal-day-name">Vi</div>
+                                        <div class="cal-day-name">Sá</div>
+                                    </div>
+                                    <div class="cal-days" id="calDays"></div>
+
+                                    <div class="time-slots" id="timeSlotsSection" style="display:none;">
+                                        <p class="time-slots-label">Horarios disponibles</p>
+                                        <div class="slots-grid" id="slotsGrid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form -->
+                        <div class="form-wrap reveal">
+
+                            <div class="form-summary" id="bookingSummary">
+                                <p class="form-summary-label">Selección Actual</p>
+                                <p class="form-summary-value" id="summaryText">
+                                    <span class="form-summary-empty">Elija un servicio y fecha para continuar.</span>
+                                </p>
+                            </div>
+
+                            <div class="field-group">
+                                <label class="field-label" for="inputNombre">Nombre Completo</label>
+                                <input class="field-input" type="text" id="inputNombre" placeholder="Tu nombre y apellido" autocomplete="name" />
+                                <p class="field-error">Por favor ingresa tu nombre completo.</p>
+                            </div>
+
+                            <div class="field-group">
+                                <label class="field-label" for="inputWA">Número de WhatsApp</label>
+                                <input class="field-input" type="tel" id="inputWA" placeholder="+54 9 11 0000 0000" autocomplete="tel" />
+                                <p class="field-error">Por favor ingresa un número de WhatsApp válido.</p>
+                            </div>
+
+                            <div class="field-group">
+                                <label class="field-label" for="inputArea">Área de Enfoque</label>
+                                <div class="field-select-wrap">
+                                    <select class="field-select" id="inputArea">
+                                        <option value="" disabled selected>Selecciona tu área principal</option>
+                                        <option value="Claridad y propósito de vida">Claridad y propósito de vida</option>
+                                        <option value="Relaciones y vínculos emocionales">Relaciones y vínculos emocionales</option>
+                                        <option value="Prosperidad y abundancia">Prosperidad y abundancia</option>
+                                        <option value="Sanación y liberación de bloqueos">Sanación y liberación de bloqueos</option>
+                                        <option value="Conexión espiritual y expansión">Conexión espiritual y expansión</option>
+                                        <option value="Misión de vida y karma">Misión de vida y karma</option>
+                                    </select>
+                                </div>
+                                <p class="field-error">Por favor selecciona un área de enfoque.</p>
+                            </div>
+
+                            <div class="field-group">
+                                <label class="field-label" for="inputNota">Nota Adicional <span style="opacity:.5;font-size:.55rem;">(Opcional)</span></label>
+                                <textarea class="field-textarea" id="inputNota" placeholder="¿Hay algo específico que desees abordar o que el facilitador deba considerar?"></textarea>
+                            </div>
+
+                            <div class="form-cta">
+                                <button class="btn btn-primary" onclick="handleSubmit()" style="text-align:center;border:none;">
+                                    <span>Solicitar Reserva →</span>
+                                </button>
+                                <p class="form-cta-note">
+                                    Al enviar, recibirás confirmación por WhatsApp en menos de 24 hrs. · Política de discreción total.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ░░ PHILOSOPHY ░░ -->
+            <section id="filosofia">
+                <div class="container">
+                    <div class="section-header reveal">
+                        <p class="section-eyebrow">Nuestra Esencia</p>
+                        <h2 class="section-title" style="color:#f5f0e2;">Principios de la Práctica</h2>
+                        <p class="section-sub" style="color:rgba(245,240,226,0.5);">Cada sesión es sostenida por pilares inamovibles de integridad, presencia y ética profesional.</p>
+                    </div>
+                    <div class="pillars reveal">
+                        <div class="pillar">
+                            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <p class="pillar-title">Discreción Absoluta</p>
+                            <p class="pillar-text">Total confidencialidad en cada intercambio y proceso. Tu privacidad es sagrada.</p>
+                        </div>
+                        <div class="pillar">
+                            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M12 14c-5 0-8 2-8 3v1h16v-1c0-1-3-3-8-3z" />
+                            </svg>
+                            <p class="pillar-title">Presencia Total</p>
+                            <p class="pillar-text">Cada sesión recibe atención undivided. Sin distracciones, sin protocolos genéricos.</p>
+                        </div>
+                        <div class="pillar">
+                            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" />
+                            </svg>
+                            <p class="pillar-title">Excelencia Ritual</p>
+                            <p class="pillar-text">Más de una década de formación y práctica continua en tradiciones de alto nivel.</p>
+                        </div>
+                        <div class="pillar">
+                            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+                            </svg>
+                            <p class="pillar-title">Ética Incondicional</p>
+                            <p class="pillar-text">Solo se trabaja desde el amor consciente, sin manipulación ni dependencia.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ░░ FOOTER ░░ -->
+            <footer>
+                <p class="footer-logo">Sanctum</p>
+                <div class="divider" style="flex:0;width:60px;margin:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" stroke-width="1" style="opacity:.6;">
+                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                    </svg>
+                </div>
+                <p class="footer-copy">© 2025 Sanctum Holístico — Todos los derechos reservados. Reservas con discreción absoluta.</p>
+            </footer>
+
+        </div><!-- /.pergamino -->
+    </div><!-- /.pergamino-wrapper -->
+
+    <!-- ░░ MODAL DE CONFIRMACIÓN (fuera del pergamino) ░░ -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">×</button>
+            <div class="modal-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22,4 12,14.01 9,11.01" />
+                </svg>
+            </div>
+            <h3 class="modal-title">Confirmar Solicitud</h3>
+            <p class="modal-text">Por favor revisa los detalles de tu solicitud antes de continuar a WhatsApp.</p>
+            <div class="modal-summary" id="modalSummaryContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-gold" onclick="goToWhatsApp()" style="border:none;text-align:center;width:100%;">
+                    <span>Continuar a WhatsApp →</span>
+                </button>
+                <button class="btn btn-outline" onclick="closeModal()" style="text-align:center;background:none;width:100%;cursor:pointer;">
+                    Modificar datos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ░░ TOAST ░░ -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════
+           STATE — Lógica intacta del original
+           ═══════════════════════════════════════════════════════════ */
+        const state = {
+            selectedService: null,
+            selectedDate: null,
+            selectedTime: null,
+            whatsappLink: null
+        };
+
+        const WHATSAPP_NUMBER = '5491100000000'; // ← Reemplaza con tu número real
+
+        /* ═══════════════════════════════════════════════════════════
+           CALENDAR
+           ═══════════════════════════════════════════════════════════ */
+        const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',
+            'Noviembre', 'Diciembre'
+        ];
+        const today = new Date();
+        let viewYear = today.getFullYear();
+        let viewMonth = today.getMonth();
+
+        const ALL_SLOTS = ['09:00', '10:00', '11:00', '13:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+
+        function renderCalendar() {
+            document.getElementById('calMonthName').textContent = months[viewMonth];
+            document.getElementById('calYear').textContent = viewYear;
+            document.getElementById('prevMonth').disabled = (viewYear === today.getFullYear() && viewMonth <= today.getMonth());
+
+            const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+            const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+            const grid = document.getElementById('calDays');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'cal-day empty';
+                grid.appendChild(empty);
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const cell = document.createElement('div');
+                cell.className = 'cal-day';
+                cell.textContent = d;
+
+                const cellDate = new Date(viewYear, viewMonth, d);
+                const isToday = (d === today.getDate() && viewMonth === today.getMonth() && viewYear === today
+                    .getFullYear());
+                const isPast = cellDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                const isSunday = cellDate.getDay() === 0;
+
+                if (isPast || isSunday) {
+                    cell.classList.add('past');
+                } else {
+                    if (isToday) cell.classList.add('today');
+                    cell.classList.add('has-slots');
+                    cell.addEventListener('click', () => selectDate(d, cell));
+                }
+
+                if (state.selectedDate) {
+                    const [sy, sm, sd] = state.selectedDate.split('-').map(Number);
+                    if (d === sd && viewMonth === sm - 1 && viewYear === sy) cell.classList.add('selected');
+                }
+
+                grid.appendChild(cell);
+            }
+        }
+
+        function selectDate(day, el) {
+            document.querySelectorAll('.cal-day').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            state.selectedDate =
+                `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            state.selectedTime = null;
+            renderTimeSlots();
+            updateSummary();
+        }
+
+        function renderTimeSlots() {
+            const section = document.getElementById('timeSlotsSection');
+            const grid = document.getElementById('slotsGrid');
+            grid.innerHTML = '';
+            section.style.display = 'block';
+
+            const isToday = (() => {
+                if (!state.selectedDate) return false;
+                const [sy, sm, sd] = state.selectedDate.split('-').map(Number);
+                return sy === today.getFullYear() && sm - 1 === today.getMonth() && sd === today.getDate();
+            })();
+
+            ALL_SLOTS.forEach(slot => {
+                const el = document.createElement('div');
+                el.className = 'time-slot';
+                el.textContent = slot;
+
+                if (isToday) {
+                    const [h, m] = slot.split(':').map(Number);
+                    const slotDate = new Date();
+                    slotDate.setHours(h, m, 0);
+                    if (slotDate <= today) { el.classList.add('past'); }
+                }
+
+                if (!el.classList.contains('past')) {
+                    el.addEventListener('click', () => {
+                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove(
+                            'selected'));
+                        el.classList.add('selected');
+                        state.selectedTime = slot;
+                        updateSummary();
+                    });
+                }
+
+                if (state.selectedTime === slot) el.classList.add('selected');
+                grid.appendChild(el);
+            });
+        }
+
+        function changeMonth(dir) {
+            viewMonth += dir;
+            if (viewMonth > 11) { viewMonth = 0;
+                viewYear++; }
+            if (viewMonth < 0) { viewMonth = 11;
+                viewYear--; }
+            renderCalendar();
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SERVICE SELECTION
+           ═══════════════════════════════════════════════════════════ */
+        function selectService(card) {
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            state.selectedService = {
+                name: card.dataset.service,
+                price: card.dataset.price,
+                duration: card.dataset.duration
+            };
+            updateSummary();
+            showToast('Servicio seleccionado. Elige fecha y horario.');
+            setTimeout(() => document.getElementById('reserva').scrollIntoView({ behavior: 'smooth',
+                block: 'start' }), 400);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SUMMARY UPDATE
+           ═══════════════════════════════════════════════════════════ */
+        function updateSummary() {
+            const el = document.getElementById('summaryText');
+            const parts = [];
+            if (state.selectedService) parts.push(state.selectedService.name);
+            if (state.selectedDate) {
+                const [y, m, d] = state.selectedDate.split('-').map(Number);
+                parts.push(`${d} de ${months[m - 1]} ${y}`);
+            }
+            if (state.selectedTime) parts.push(`${state.selectedTime} hrs`);
+
+            if (parts.length === 0) {
+                el.innerHTML = '<span class="form-summary-empty">Elija un servicio y fecha para continuar.</span>';
+            } else {
+                el.textContent = parts.join(' · ');
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           FORM SUBMISSION
+           ═══════════════════════════════════════════════════════════ */
+        function validate() {
+            let ok = true;
+            const nombre = document.getElementById('inputNombre');
+            const wa = document.getElementById('inputWA');
+            const area = document.getElementById('inputArea');
+
+            [nombre, wa, area].forEach(f => f.closest('.field-group').classList.remove('error'));
+
+            if (!nombre.value.trim() || nombre.value.trim().split(' ').length < 2) {
+                nombre.closest('.field-group').classList.add('error');
+                ok = false;
+            }
+            if (!wa.value.trim() || wa.value.trim().length < 8) {
+                wa.closest('.field-group').classList.add('error');
+                ok = false;
+            }
+            if (!area.value) {
+                area.closest('.field-group').classList.add('error');
+                ok = false;
+            }
+            if (!state.selectedService) {
+                showToast('Por favor selecciona un servicio primero.');
+                ok = false;
+            }
+            if (!state.selectedDate) {
+                showToast('Por favor selecciona una fecha.');
+                ok = false;
+            }
+            if (!state.selectedTime) {
+                showToast('Por favor selecciona un horario.');
+                ok = false;
+            }
+            return ok;
+        }
+
+        function handleSubmit() {
+            if (!validate()) return;
+
+            const nombre = document.getElementById('inputNombre').value.trim();
+            const wa = document.getElementById('inputWA').value.trim();
+            const area = document.getElementById('inputArea').value;
+            const nota = document.getElementById('inputNota').value.trim();
+            const [y, m, d] = state.selectedDate.split('-').map(Number);
+            const fechaStr = `${d} de ${months[m - 1]} de ${y}`;
+
+            const mensaje = [
+                `Estimado/a equipo de *Sanctum Holístico*,`,
+                ``,
+                `Me dirijo a ustedes con el fin de solicitar formalmente una reserva para la siguiente sesión:`,
+                ``,
+                `• *Servicio:* ${state.selectedService.name}`,
+                `• *Fecha solicitada:* ${fechaStr}`,
+                `• *Horario preferido:* ${state.selectedTime} hrs`,
+                `• *Área de Enfoque:* ${area}`,
+                nota ? `• *Nota adicional:* ${nota}` : null,
+                ``,
+                `*Datos de contacto:*`,
+                `• Nombre: ${nombre}`,
+                `• WhatsApp: ${wa}`,
+                ``,
+                `Quedo a la espera de su confirmación. Muchas gracias.`,
+                ``,
+                `Atentamente,`,
+                `${nombre}`
+            ].filter(l => l !== null).join('\n');
+
+            state.whatsappLink =
+                `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+
+            // Build modal content
+            const modal = document.getElementById('modalSummaryContent');
+            const rows = [
+                ['Servicio', state.selectedService.name],
+                ['Duración', state.selectedService.duration],
+                ['Inversión', state.selectedService.price],
+                ['Fecha', fechaStr],
+                ['Horario', `${state.selectedTime} hrs`],
+                ['Nombre', nombre],
+                ['Área', area]
+            ];
+            modal.innerHTML = rows.map(([k, v]) => `
+            <div class="modal-summary-row">
+              <span class="modal-summary-key">${k}</span>
+              <span class="modal-summary-val">${v}</span>
+            </div>
+          `).join('');
+
+            openModal();
+        }
+
+        function goToWhatsApp() {
+            if (state.whatsappLink) window.open(state.whatsappLink, '_blank');
+            closeModal();
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           MODAL
+           ═══════════════════════════════════════════════════════════ */
+        function openModal() {
+            document.getElementById('confirmModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        /* ═══════════════════════════════════════════════════════════
+           TOAST
+           ═══════════════════════════════════════════════════════════ */
+        let toastTimer = null;
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           INTERSECTION OBSERVER (REVEAL)
+           ═══════════════════════════════════════════════════════════ */
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible');
+                    io.unobserve(e.target); }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        /* ═══════════════════════════════════════════════════════════
+           INIT
+           ═══════════════════════════════════════════════════════════ */
+        renderCalendar();
+    </script>
+</body>
+</html>
